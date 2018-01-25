@@ -1,4 +1,4 @@
-#Brief#
+# Brief
 
 This is a proof of concept based on research for a 2016 Knight Visiting Nieman Fellowship, focused on machine learning and explanatory journalism. 
 
@@ -6,7 +6,7 @@ The idea is to explore how software might generate background briefs to help jou
 
 This code relies on APIs to find quality content on a topic, summarize it, and report on the various sub-topics it includes. The output is an HTML document.
 
-##Required APIs include:##
+## Required APIs include:
 Bing (search for links)
 Diffbot (get article text)
 Agolo (summarize articles)

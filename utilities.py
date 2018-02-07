@@ -11,6 +11,7 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
 
 from model import Article
+import pdb
 
 def remove_stop_words(tokens):
     #Takes a list of words, remove common ones
@@ -228,13 +229,13 @@ def bing(key,term,number_of_results,offset,news=False,sites=[]):
         return e
         print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
-def google(term):
+def google(term,number_of_results=10):
     # https://developers.google.com/custom-search/docs/start
     # https://google-api-client-libraries.appspot.com/documentation/customsearch/v1/python/latest/index.html
     service = build("customsearch", "v1", developerKey="AIzaSyBSCEKKW2DB05yJhAa7IhiFv_1Ww01wRU8")
 
     res = service.cse().list(
-        q=term,
+        q=term, num=number_of_results,
         cx='013679191244934975269:vjsjeuddshy'
     ).execute()
 
@@ -247,22 +248,32 @@ def google(term):
     return articles
 
 def algorithmia(article_url):
-    article = Article(url=article_url)
+    article = Article()
     # url, title, text, summary, source, topics=[], entities=[]
+    client = Algorithmia.client('simnNb/xFW14yGsLgE67mA2gXdP1')
 
     try:
-        client = Algorithmia.client('simnNb/xFW14yGsLgE67mA2gXdP1')
-        html2Text = client.algo('util/Html2Text/0.1.6')
-        article.text = (html2Text.pipe(article_url))
+        # https://algorithmia.com/algorithms/web/AnalyzeURL
+        analyzeURL = client.algo('web/AnalyzeURL/0.2.17')
+        temp = (analyzeURL.pipe(article_url))
+        article.url = temp.result['url']
+        article.title = temp.result['title']
+        article.text = temp.result['text']
 
     except Exception as e:
-        print("[Html2Text: {0}] {1}".format(e.errno, e.strerror))
+        print("[AnalyzeURL: {0}] {1}".format(e.errno, e.strerror))
+
+    # try:
+        # https://algorithmia.com/algorithms/util/Html2Text
+        # html2Text = client.algo('util/Html2Text/0.1.6')
+        # article.text = (html2Text.pipe(article_url)).result
+    # except Exception as e:
+        # print("[Html2Text: {0}] {1}".format(e.errno, e.strerror))
 
     try:
-        client = Algorithmia.client('simnNb/xFW14yGsLgE67mA2gXdP1')
+        # https://algorithmia.com/algorithms/nlp/SummarizeURL
         summarizeURL = client.algo('nlp/SummarizeURL/0.1.4')
-        article.summary = (summarizeURL.pipe(article_url))
-
+        article.summary = (summarizeURL.pipe(article_url)).result
     except Exception as e:
         print("[SummarizeURL: {0}] {1}".format(e.errno, e.strerror))
 

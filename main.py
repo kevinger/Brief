@@ -15,7 +15,7 @@ term = "income inequality"
 
 #Search Bing for links from reliable sources
 print "Searching for links to evaluate..."
-links = google(term)
+links = google(term,3)
 
 #Get article text for each link
 print "Getting summary..."

@@ -22,8 +22,9 @@ subheds = ['Causes',
            'Policies to address inequality']
 
 #Search Bing for links from reliable sources
-print "Searching Bing..."
-links = bing(bing_key,term,20,0,news=False,sites=sites)
+print "Searching for links to evaluate..."
+# links = bing(bing_key,term,20,0,news=False,sites=sites)
+links = google(term)
 
 #Get article text for each link
 print "Getting text from Diffbot..."
@@ -114,7 +115,7 @@ for s in subheds:
             top_similarity=score
             best_answer = article
     subheds_with_similar.append([s,best_answer,top_similarity])
-    
+
 
 #Fill html template with data
 html = Template(report)

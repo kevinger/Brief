@@ -1,9 +1,10 @@
 from keys import *
-import httplib, urllib, base64, json 
+import httplib, urllib, base64, json
 import requests, json
 
 import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer 
+from googleapiclient.discovery import build
+from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
@@ -105,7 +106,7 @@ def openCalais(access_token, text):
 def agolo(key,num_sentences,title,text):
     #Takes a key, a number of sentences, a headline and text. Returns Agolo summary object
     #Documentation: https://dev.agolo.com/docs/services/570d7b4f88b6e5116cdf6a17/operations/570d7b5188b6e508dcfb1c90
-    
+
     body = {
         "summary_length": num_sentences,
         "articles": [{
@@ -117,7 +118,7 @@ def agolo(key,num_sentences,title,text):
 
     body = json.JSONEncoder().encode(body)
 
-    
+
     headers = {
         # Request headers
         'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ def diffbot(url,key):
     endpoint = 'https://api.diffbot.com/v3/article?' + 'token=' + key + '&url='
 
     result = requests.get(endpoint + url)
-    result = json.loads(result.text)   
+    result = json.loads(result.text)
 
     try:
         title = result['objects'][0]['title']
@@ -181,7 +182,7 @@ def bing(key,term,number_of_results,offset,news=False,sites=[]):
                 sites_string = sites_string + site
             count +=1
         term = term + sites_string
-    
+
     headers = {
         # Request headers
         'Ocp-Apim-Subscription-Key': key,
@@ -223,3 +224,21 @@ def bing(key,term,number_of_results,offset,news=False,sites=[]):
     except Exception as e:
         return e
         print("[Errno {0}] {1}".format(e.errno, e.strerror))
+
+def google(term):
+    # https://developers.google.com/custom-search/docs/start
+    # https://google-api-client-libraries.appspot.com/documentation/customsearch/v1/python/latest/index.html
+    service = build("customsearch", "v1", developerKey="AIzaSyBSCEKKW2DB05yJhAa7IhiFv_1Ww01wRU8")
+
+    res = service.cse().list(
+        q=term,
+        cx='013679191244934975269:vjsjeuddshy'
+    ).execute()
+
+    articles = []
+
+    for item in res['items']:
+        articles.append(item['link'])
+        # print "{}: {}".format(item['title'], item['link'])
+
+    return articles

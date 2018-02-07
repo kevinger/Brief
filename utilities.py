@@ -3,11 +3,14 @@ import httplib, urllib, base64, json
 import requests, json
 
 import nltk
+import Algorithmia
 from googleapiclient.discovery import build
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
+
+from model import Article
 
 def remove_stop_words(tokens):
     #Takes a list of words, remove common ones
@@ -242,3 +245,25 @@ def google(term):
         # print "{}: {}".format(item['title'], item['link'])
 
     return articles
+
+def algorithmia(article_url):
+    article = Article(url=article_url)
+    # url, title, text, summary, source, topics=[], entities=[]
+
+    try:
+        client = Algorithmia.client('simnNb/xFW14yGsLgE67mA2gXdP1')
+        html2Text = client.algo('util/Html2Text/0.1.6')
+        article.text = (html2Text.pipe(article_url))
+
+    except Exception as e:
+        print("[Html2Text: {0}] {1}".format(e.errno, e.strerror))
+
+    try:
+        client = Algorithmia.client('simnNb/xFW14yGsLgE67mA2gXdP1')
+        summarizeURL = client.algo('nlp/SummarizeURL/0.1.4')
+        article.summary = (summarizeURL.pipe(article_url))
+
+    except Exception as e:
+        print("[SummarizeURL: {0}] {1}".format(e.errno, e.strerror))
+
+    return article

@@ -24,4 +24,13 @@ articles = []
 for link in links:
     articles.append(algorithmia(link))
 
+if articles:
+    for article in articles:
+        print "  {}".format(article.url)
+        print "  {}".format(article.title)
+        print "  {}".format(article.summary.encode('utf-8'))
+        print "\n\t----------------------\n"
+else:
+    print "Error, sort of: no articles found for '{}'?".format(term)
+
 # pdb.set_trace()

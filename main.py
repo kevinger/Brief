@@ -1,11 +1,12 @@
-from utilities import *
-from keys import *
+from utilities import google, algorithmia
+# from keys import *
 from sources import sites
 from model import Article
-import time
 from jinja2 import Template
 from report import report
 from urlparse import urlparse
+
+import time
 import codecs
 
 import pdb
@@ -23,4 +24,4 @@ articles = []
 for link in links:
     articles.append(algorithmia(link))
 
-pdb.set_trace()
+# pdb.set_trace()
